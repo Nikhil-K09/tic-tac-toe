@@ -13,7 +13,7 @@ import com.example.tictactoe.databinding.ActivityMainBinding
 class GameActivity : AppCompatActivity(), View.OnClickListener {
     lateinit var binding: ActivityGameBinding
     private var gameModel: GameModel? =null
-    //private lateinit var buttonMap: Map<Int, android.widget.Button>
+    private lateinit var buttonMap: Map<Int, android.widget.Button>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,17 +36,17 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
         binding.btn7.setOnClickListener(this)
         binding.btn8.setOnClickListener(this)
 
-//        buttonMap = mapOf(
-//            0 to binding.btn0,
-//            1 to binding.btn1,
-//            2 to binding.btn2,
-//            3 to binding.btn3,
-//            4 to binding.btn4,
-//            5 to binding.btn5,
-//            6 to binding.btn6,
-//            7 to binding.btn7,
-//            8 to binding.btn8
-//        )
+        buttonMap = mapOf(
+            0 to binding.btn0,
+            1 to binding.btn1,
+            2 to binding.btn2,
+            3 to binding.btn3,
+            4 to binding.btn4,
+            5 to binding.btn5,
+            6 to binding.btn6,
+            7 to binding.btn7,
+            8 to binding.btn8
+        )
 
 
         binding.startGameBtn.setOnClickListener{
@@ -59,35 +59,31 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
         }
 
     }
-    fun setUI(){
+    fun setUI() {
         gameModel?.apply {
-            binding.btn0.text = filledPos[0]
-            binding.btn1.text = filledPos[1]
-            binding.btn2.text = filledPos[2]
-            binding.btn3.text = filledPos[3]
-            binding.btn4.text = filledPos[4]
-            binding.btn5.text = filledPos[5]
-            binding.btn6.text = filledPos[6]
-            binding.btn7.text = filledPos[7]
-            binding.btn8.text = filledPos[8]
+            val allButtons = listOf(
+                binding.btn0, binding.btn1, binding.btn2,
+                binding.btn3, binding.btn4, binding.btn5,
+                binding.btn6, binding.btn7, binding.btn8
+            )
 
+            for ((index, btn) in allButtons.withIndex()) {
+                btn.text = filledPos[index]
 
-            binding.gameStatusText.text=
-                when(gameStatus){
-                    GameStatus.CREATED -> {
-                        "Game ID : "+gameId
-                    }
-                    GameStatus.JOINED -> {
-                        "click start"
-                    }
-                    GameStatus.INPROGRESS -> {
-                        currentPlayer+"turn"
-                    }
-                    GameStatus.FINISHED -> {
-                        if(winner.isNotEmpty()) winner +" won"
-                        else "draw"
-                    }
+                // Highlight the oldest move
+                if (index == highlightedMove) {
+                    btn.setBackgroundColor(resources.getColor(android.R.color.darker_gray, theme))
+                } else {
+                    btn.setBackgroundColor(resources.getColor(android.R.color.holo_blue_light, theme)) // or your default color
                 }
+            }
+
+            binding.gameStatusText.text = when (gameStatus) {
+                GameStatus.CREATED -> "Game ID : $gameId"
+                GameStatus.JOINED -> "Click Start"
+                GameStatus.INPROGRESS -> "$currentPlayer turn"
+                GameStatus.FINISHED -> if (winner.isNotEmpty()) "$winner won" else "Draw"
+            }
         }
     }
 
@@ -119,7 +115,10 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
         )
 
         gameModel?.apply {
+
             for(i in winningPos){
+                if (i.any { it == highlightedMove }) continue
+
                 if(filledPos[i[0]]==filledPos[i[1]] && filledPos[i[1]]==filledPos[i[2]] && filledPos[i[0]].isNotEmpty()){
                     gameStatus=GameStatus.FINISHED
                     winner=filledPos[i[0]]
@@ -136,35 +135,29 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
         gameModel?.apply {
-            if(gameStatus!=GameStatus.INPROGRESS){
-                Toast.makeText(applicationContext,"Game Not Started",Toast.LENGTH_SHORT).show()
+            if (gameStatus != GameStatus.INPROGRESS) {
+                Toast.makeText(applicationContext, "Game Not Started", Toast.LENGTH_SHORT).show()
                 return
             }
-            //game in progress processing
+
             val clickedPos = (v?.tag as String).toInt()
-            if(filledPos[clickedPos].isEmpty()){
+            if (filledPos[clickedPos].isEmpty()) {
+                filledPos[clickedPos] = currentPlayer
+                moveHistory.add(clickedPos)
 
-                //improved Unique RULE Logic
-//                if (moveHistory.size >= 6) {
-//                    val oldestPos = moveHistory.removeAt(0)
-//                    filledPos[oldestPos] = ""
-//
-//                    // Clear the corresponding button's text immediately
-//                    val buttonId = resources.getIdentifier("btn_$oldestPos", "id", packageName)
-//                    findViewById<View>(buttonId)?.let {
-//                        if (it is android.widget.Button) {
-//                            it.text = ""
-//                        }
-//                    }
-//                }
+                highlightedMove = if (moveHistory.size > 5) moveHistory[0] else null
 
-                filledPos[clickedPos]=currentPlayer
-                currentPlayer = if(currentPlayer=="X") "O" else "X"
+                // Remove oldest move after 7th click
+                if (moveHistory.size > 6) {
+                    val removedPos = moveHistory.removeAt(0)
+                    filledPos[removedPos] = ""
+                    highlightedMove = if (moveHistory.size > 5) moveHistory[0] else null
+                }
+
+                currentPlayer = if (currentPlayer == "X") "O" else "X"
                 checkForWinner()
                 updateGameData(this)
             }
-
         }
-
     }
 }

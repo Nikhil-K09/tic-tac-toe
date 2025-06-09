@@ -8,7 +8,9 @@ data class GameModel (
     var winner:String="",
     var gameStatus: GameStatus=GameStatus.CREATED,
     var currentPlayer:String= (arrayOf("X","O"))[Random.nextInt(2)],
-    var moveHistory: MutableList<Int> = mutableListOf() //track move order
+    var moveHistory: MutableList<Int> = mutableListOf(), //track move order
+    var highlightedMove: Int? = null
+
 )
 
 enum class GameStatus{
