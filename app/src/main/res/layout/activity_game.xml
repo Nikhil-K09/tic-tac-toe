@@ -10,15 +10,15 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Game not started"
-        android:id="@+id/game_status_text"
+        android:text="Tic Tac Toe"
         android:layout_margin="10dp"
         android:layout_gravity="center"
         android:textSize="18sp"/>
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tic Tac Toe"
+        android:text="Game not started"
+        android:id="@+id/game_status_text"
         android:layout_margin="10dp"
         android:layout_gravity="center"
         android:textSize="18sp"/>

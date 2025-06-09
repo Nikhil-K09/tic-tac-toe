@@ -21,6 +21,7 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
 
         enableEdgeToEdge()
         setContentView(binding.root)
+        GameData.fetchGameModel()
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -77,13 +78,36 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
                     btn.setBackgroundColor(resources.getColor(android.R.color.holo_blue_light, theme)) // or your default color
                 }
             }
+            binding.startGameBtn.visibility=View.VISIBLE
 
-            binding.gameStatusText.text = when (gameStatus) {
-                GameStatus.CREATED -> "Game ID : $gameId"
-                GameStatus.JOINED -> "Click Start"
-                GameStatus.INPROGRESS -> "$currentPlayer turn"
-                GameStatus.FINISHED -> if (winner.isNotEmpty()) "$winner won" else "Draw"
-            }
+            binding.gameStatusText.text =
+                when(gameStatus){
+                    GameStatus.CREATED -> {
+                        binding.startGameBtn.visibility = View.INVISIBLE
+                        "Game ID :"+ gameId
+                    }
+                    GameStatus.JOINED ->{
+                        "Click on start game"
+                    }
+                    GameStatus.INPROGRESS ->{
+                        binding.startGameBtn.visibility = View.INVISIBLE
+                        when(GameData.myID){
+                            currentPlayer -> "Your turn"
+                            else ->  currentPlayer + " turn"
+                        }
+
+                    }
+                    GameStatus.FINISHED ->{
+                        if(winner.isNotEmpty()) {
+                            when(GameData.myID){
+                                winner -> "You won"
+                                else ->   winner + " Won"
+                            }
+
+                        }
+                        else "DRAW"
+                    }
+                }
         }
     }
 
@@ -137,6 +161,10 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
         gameModel?.apply {
             if (gameStatus != GameStatus.INPROGRESS) {
                 Toast.makeText(applicationContext, "Game Not Started", Toast.LENGTH_SHORT).show()
+                return
+            }
+            if(gameId!="-1" && currentPlayer!=GameData.myID){
+                Toast.makeText(applicationContext, "Not Your Turn", Toast.LENGTH_SHORT).show()
                 return
             }
 

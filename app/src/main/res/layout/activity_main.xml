@@ -22,5 +22,27 @@
         android:text="Play offline"
         android:layout_margin="10dp"
         android:textAllCaps="true"/>
+    <Button
+        android:id="@+id/create_online_game_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Play online"
+        android:layout_margin="10dp"
+        android:textAllCaps="true"/>
+    <EditText
+        android:id="@+id/game_id_input"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:inputType="number"
+        android:hint="enter game id"/>
+    <Button
+        android:id="@+id/join_online_game_btn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="join game"
+        android:layout_margin="10dp"
+        android:textAllCaps="true"/>
+
 
 </LinearLayout>
