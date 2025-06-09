@@ -5,7 +5,8 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
+    android:layout_gravity="center"
+    style="@style/screen"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
@@ -13,36 +14,78 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Tic Tac Toe"
-        android:layout_margin="10dp"
-        android:textSize="18sp"/>
-    <Button
-        android:id="@+id/play_offline_btn"
+        style="@style/app_title"
+        android:textSize="38sp"
+        android:layout_marginBottom="50dp"
+        android:layout_marginTop="100dp"
+        android:textStyle="bold"
+        android:layout_gravity="center"
+        android:fontFamily="serif"
+        android:elegantTextHeight="true"
+        android:elevation="20dp"
+        android:padding="5dp"/>
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Play offline"
-        android:layout_margin="10dp"
-        android:textAllCaps="true"/>
-    <Button
-        android:id="@+id/create_online_game_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Play online"
-        android:layout_margin="10dp"
-        android:textAllCaps="true"/>
+        android:orientation="vertical"
+        android:layout_gravity="center"
+        android:layout_marginTop="20dp"
+        android:gravity="center">
+        <Button
+            android:id="@+id/play_offline_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            style="@style/main_btn"
+            android:elevation="7dp"
+            android:textSize="20sp"
+            android:padding="16dp"
+            android:background="@drawable/rounded_corner_blue"
+            android:layout_marginBottom="15dp"
+            android:text="Play offline"
+            android:textAllCaps="true"/>
+        <Button
+            android:id="@+id/create_online_game_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/rounded_corner_blue"
+            style="@style/main_btn"
+            android:elevation="7dp"
+            android:textSize="20sp"
+            android:padding="16dp"
+            android:text="Play online"
+            android:textAllCaps="true"/>
+    </LinearLayout>
+
     <EditText
         android:id="@+id/game_id_input"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textSize="18sp"
+        android:textSize="15sp"
+        android:layout_marginTop="30dp"
+        android:layout_gravity="center"
         android:inputType="number"
-        android:hint="enter game id"/>
+        android:hint="Enter room id"/>
     <Button
         android:id="@+id/join_online_game_btn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="join game"
-        android:layout_margin="10dp"
+        android:layout_gravity="center"
+        style="@style/main_btn"
+        android:elevation="7dp"
+        android:textSize="15sp"
+        android:background="@drawable/rounded_corner_green"
+        android:layout_margin="3dp"
+        android:text="join"
         android:textAllCaps="true"/>
-
+    <Button
+        android:id="@+id/btnShowRules"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        style="@style/rules"
+        android:text="Rules"
+        android:textSize="15sp"
+        android:background="@drawable/rounded_corner_red"
+        android:layout_marginTop="85dp"
+        android:layout_gravity="center" />
 
 </LinearLayout>

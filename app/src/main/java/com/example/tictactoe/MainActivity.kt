@@ -3,6 +3,7 @@ package com.example.tictactoe
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -40,6 +41,31 @@ class MainActivity : AppCompatActivity() {
 
         binding.joinOnlineGameBtn.setOnClickListener{
             joinOnlineGame()
+        }
+
+        val rules = """
+                    - Players take turns putting their marks in empty squares.
+                    
+                    - The first to get 3 in a row wins!
+                    
+                    Unique Rule -  
+                    After 6 moves the oldest move will be highlighted
+                        
+                    When 7th move is made the oldest move disappears
+                        
+                    The highlighted move is not counted for winning
+                        
+                    NO MORE DRAWS!
+                """.trimIndent()
+
+        binding.btnShowRules.setOnClickListener {
+            AlertDialog.Builder(this)
+                .setTitle("Game Rules")
+                .setMessage(rules)
+                .setPositiveButton("Got it") { dialog, _ ->
+                    dialog.dismiss()
+                }
+                .show()
         }
     }
 

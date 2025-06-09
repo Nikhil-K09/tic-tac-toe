@@ -73,9 +73,9 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
 
                 // Highlight the oldest move
                 if (index == highlightedMove) {
-                    btn.setBackgroundColor(resources.getColor(android.R.color.darker_gray, theme))
+                    btn.alpha = 0.4f  // faded
                 } else {
-                    btn.setBackgroundColor(resources.getColor(android.R.color.holo_blue_light, theme)) // or your default color
+                    btn.alpha = 1.0f  // normal
                 }
             }
             binding.startGameBtn.visibility=View.VISIBLE
@@ -93,7 +93,7 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
                         binding.startGameBtn.visibility = View.INVISIBLE
                         when(GameData.myID){
                             currentPlayer -> "Your turn"
-                            else ->  currentPlayer + " turn"
+                            else ->  currentPlayer + "'s turn"
                         }
 
                     }

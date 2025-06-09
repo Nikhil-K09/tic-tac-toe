@@ -3,7 +3,7 @@
   <component name="deploymentTargetSelector">
     <selectionStates>
       <SelectionState runConfigName="app">
-        <option name="selectionMode" value="DROPDOWN" />
+        <option name="selectionMode" value="DIALOG" />
         <DropdownSelection timestamp="2025-06-09T07:42:29.606336100Z">
           <Target type="DEFAULT_BOOT">
             <handle>
@@ -15,12 +15,12 @@
           <targets>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="PhysicalDevice" identifier="serial=efd825cf" />
+                <DeviceId pluginId="PhysicalDevice" identifier="serial=a0d2e8f2" />
               </handle>
             </Target>
             <Target type="DEFAULT_BOOT">
               <handle>
-                <DeviceId pluginId="PhysicalDevice" identifier="serial=a0d2e8f2" />
+                <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\nikhi\.android\avd\Pixel_8_Pro_API_29.avd" />
               </handle>
             </Target>
           </targets>
