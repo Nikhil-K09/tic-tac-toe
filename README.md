@@ -23,3 +23,7 @@ A tic tac toe game developed in Android Studio using Kotlin and connected to fir
 </a>
 
 </div>
+
+## Installation
+Clone git repository and import this project in android studio.
+In android studio Tools > Firebase > Firestore , connect the project to firebase and sync build gradle.
