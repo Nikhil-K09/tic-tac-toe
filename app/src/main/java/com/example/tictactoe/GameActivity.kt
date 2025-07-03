@@ -8,163 +8,116 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.tictactoe.databinding.ActivityGameBinding
-import com.example.tictactoe.databinding.ActivityMainBinding
+import com.google.firebase.firestore.FirebaseFirestore
 
 class GameActivity : AppCompatActivity(), View.OnClickListener {
+
     lateinit var binding: ActivityGameBinding
-    private var gameModel: GameModel? =null
-    private lateinit var buttonMap: Map<Int, android.widget.Button>
+    private var gameModel: GameModel? = null
+    private val firestore = FirebaseFirestore.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding=ActivityGameBinding.inflate(layoutInflater)
-
+        binding = ActivityGameBinding.inflate(layoutInflater)
         enableEdgeToEdge()
         setContentView(binding.root)
         GameData.fetchGameModel()
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        binding.btn0.setOnClickListener(this)
-        binding.btn1.setOnClickListener(this)
-        binding.btn2.setOnClickListener(this)
-        binding.btn3.setOnClickListener(this)
-        binding.btn4.setOnClickListener(this)
-        binding.btn5.setOnClickListener(this)
-        binding.btn6.setOnClickListener(this)
-        binding.btn7.setOnClickListener(this)
-        binding.btn8.setOnClickListener(this)
 
-        buttonMap = mapOf(
-            0 to binding.btn0,
-            1 to binding.btn1,
-            2 to binding.btn2,
-            3 to binding.btn3,
-            4 to binding.btn4,
-            5 to binding.btn5,
-            6 to binding.btn6,
-            7 to binding.btn7,
-            8 to binding.btn8
-        )
+        listOf(
+            binding.btn0, binding.btn1, binding.btn2, binding.btn3, binding.btn4,
+            binding.btn5, binding.btn6, binding.btn7, binding.btn8
+        ).forEach { it.setOnClickListener(this) }
 
+        binding.startGameBtn.setOnClickListener { startGame() }
 
-        binding.startGameBtn.setOnClickListener{
-            startGame()
-        }
-
-        GameData.gameModel.observe(this){
-            gameModel=it
+        GameData.gameModel.observe(this) {
+            gameModel = it
+            it?.let { model ->
+                if (model.playerLeft != null && model.playerLeft != GameData.myID) {
+                    Toast.makeText(this, "Opponent left the game", Toast.LENGTH_LONG).show()
+                    firestore.collection("games").document(model.gameId).delete()
+                    finish()
+                }
+            }
             setUI()
         }
-
     }
-    fun setUI() {
+
+    private fun setUI() {
         gameModel?.apply {
-            val allButtons = listOf(
+            val buttons = listOf(
                 binding.btn0, binding.btn1, binding.btn2,
                 binding.btn3, binding.btn4, binding.btn5,
                 binding.btn6, binding.btn7, binding.btn8
             )
 
-            for ((index, btn) in allButtons.withIndex()) {
+            buttons.forEachIndexed { index, btn ->
                 btn.text = filledPos[index]
-
-                // Highlight the oldest move
-                if (index == highlightedMove) {
-                    btn.alpha = 0.4f  // faded
-                } else {
-                    btn.alpha = 1.0f  // normal
-                }
+                btn.alpha = if (index == highlightedMove) 0.4f else 1.0f
             }
-            binding.startGameBtn.visibility=View.VISIBLE
 
-            binding.gameStatusText.text =
-                when(gameStatus){
-                    GameStatus.CREATED -> {
-                        binding.startGameBtn.visibility = View.INVISIBLE
-                        "Game ID :"+ gameId
-                    }
-                    GameStatus.JOINED ->{
-                        "Click on start game"
-                    }
-                    GameStatus.INPROGRESS ->{
-                        binding.startGameBtn.visibility = View.INVISIBLE
-                        when(GameData.myID){
-                            currentPlayer -> "Your turn"
-                            else ->  currentPlayer + "'s turn"
-                        }
+            // Set visibility of the start button based on game status
+            binding.startGameBtn.visibility = when (gameStatus) {
+                GameStatus.CREATED -> View.VISIBLE
+                GameStatus.JOINED -> View.VISIBLE
+                GameStatus.INPROGRESS -> View.INVISIBLE
+                GameStatus.FINISHED -> View.VISIBLE // Optional: You can set this to INVISIBLE if you prefer
+            }
 
-                    }
-                    GameStatus.FINISHED ->{
-                        if(winner.isNotEmpty()) {
-                            when(GameData.myID){
-                                winner -> "You won"
-                                else ->   winner + " Won"
-                            }
-
-                        }
-                        else "DRAW"
-                    }
-                }
+            binding.gameStatusText.text = when (gameStatus) {
+                GameStatus.CREATED -> "Game ID: $gameId"
+                GameStatus.JOINED -> "Click Start Game"
+                GameStatus.INPROGRESS -> if (GameData.myID == currentPlayer) "Your turn" else "$currentPlayer's turn"
+                GameStatus.FINISHED -> if (winner.isNotEmpty()) "$winner won" else "Draw"
+            }
         }
     }
 
-    fun startGame() {
+
+    private fun startGame() {
         gameModel?.apply {
-            updateGameData(
-                GameModel(
-                    gameId =gameId,
-                    gameStatus =GameStatus.INPROGRESS
-                )
-            )
+            updateGameData(copy(gameStatus = GameStatus.INPROGRESS))
         }
     }
-    fun updateGameData(model :GameModel){
+
+    private fun updateGameData(model: GameModel) {
         GameData.saveGameModel(model)
     }
-    fun checkForWinner(){
-        val winningPos=arrayOf(
-            intArrayOf(0,1,2),
-            intArrayOf(3,4,5),
-            intArrayOf(6,7,8),
 
-            intArrayOf(0,3,6),
-            intArrayOf(1,4,7),
-            intArrayOf(2,5,8),
-
-            intArrayOf(0,4,8),
-            intArrayOf(2,4,6)
+    private fun checkForWinner() {
+        val winningPos = arrayOf(
+            intArrayOf(0, 1, 2), intArrayOf(3, 4, 5), intArrayOf(6, 7, 8),
+            intArrayOf(0, 3, 6), intArrayOf(1, 4, 7), intArrayOf(2, 5, 8),
+            intArrayOf(0, 4, 8), intArrayOf(2, 4, 6)
         )
-
         gameModel?.apply {
-
-            for(i in winningPos){
-                if (i.any { it == highlightedMove }) continue
-
-                if(filledPos[i[0]]==filledPos[i[1]] && filledPos[i[1]]==filledPos[i[2]] && filledPos[i[0]].isNotEmpty()){
-                    gameStatus=GameStatus.FINISHED
-                    winner=filledPos[i[0]]
+            for (pos in winningPos) {
+                if (pos.any { it == highlightedMove }) continue
+                if (filledPos[pos[0]] == filledPos[pos[1]] &&
+                    filledPos[pos[1]] == filledPos[pos[2]] &&
+                    filledPos[pos[0]].isNotEmpty()) {
+                    gameStatus = GameStatus.FINISHED
+                    winner = filledPos[pos[0]]
                 }
-            }
-            if(filledPos.none(){it.isEmpty()}){
-                gameStatus=GameStatus.FINISHED
-
             }
             updateGameData(this)
         }
-
     }
 
     override fun onClick(v: View?) {
         gameModel?.apply {
             if (gameStatus != GameStatus.INPROGRESS) {
-                Toast.makeText(applicationContext, "Game Not Started", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@GameActivity, "Game not started", Toast.LENGTH_SHORT).show()
                 return
             }
-            if(gameId!="-1" && currentPlayer!=GameData.myID){
-                Toast.makeText(applicationContext, "Not Your Turn", Toast.LENGTH_SHORT).show()
+            if (gameId != "-1" && currentPlayer != GameData.myID) {
+                Toast.makeText(this@GameActivity, "Not your turn", Toast.LENGTH_SHORT).show()
                 return
             }
 
@@ -175,16 +128,36 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
 
                 highlightedMove = if (moveHistory.size > 5) moveHistory[0] else null
 
-                // Remove oldest move after 7th click
                 if (moveHistory.size > 6) {
-                    val removedPos = moveHistory.removeAt(0)
-                    filledPos[removedPos] = ""
+                    val removed = moveHistory.removeAt(0)
+                    filledPos[removed] = ""
                     highlightedMove = if (moveHistory.size > 5) moveHistory[0] else null
                 }
 
                 currentPlayer = if (currentPlayer == "X") "O" else "X"
                 checkForWinner()
                 updateGameData(this)
+            }
+        }
+    }
+
+    override fun onBackPressed() {
+        handlePlayerExit()
+        super.onBackPressed()
+    }
+
+    override fun onDestroy() {
+        handlePlayerExit()
+        super.onDestroy()
+    }
+
+    private fun handlePlayerExit() {
+        gameModel?.apply {
+            if (gameId != "-1" && gameStatus == GameStatus.INPROGRESS) {
+                playerLeft = GameData.myID
+                updateGameData(this)
+            } else if (gameStatus == GameStatus.FINISHED) {
+                firestore.collection("games").document(gameId).delete()
             }
         }
     }
