@@ -82,10 +82,16 @@ class GameActivity : AppCompatActivity(), View.OnClickListener {
 
     private fun startGame() {
         gameModel?.apply {
-            updateGameData(copy(gameStatus = GameStatus.INPROGRESS))
+            filledPos = MutableList(9) { "" }
+            moveHistory = mutableListOf()
+            highlightedMove = null
+            winner = ""
+            currentPlayer = "X" // Or choose randomly or remember who started last
+            gameStatus = GameStatus.INPROGRESS
+
+            updateGameData(this)
         }
     }
-
     private fun updateGameData(model: GameModel) {
         GameData.saveGameModel(model)
     }
